@@ -303,6 +303,9 @@ func SetGroup(g *Group) error {
 		if err != nil {
 			return err
 		}
+		if err := auth.saveUsers(g); err != nil {
+			return fmt.Errorf("保存ldap用户 %s 失败", err.Error())
+		}
 		// 重置Auth， 删除多余的key
 		g.Auth = map[string]interface{}{
 			"type":   authType,
@@ -340,7 +343,8 @@ func GroupAuthLogin(name, pwd string, authData map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = auth.checkUser(name, pwd, g)
+	ext := map[string]interface{}{}
+	err = auth.checkUser(name, pwd, g, ext)
 	return err
 }
 
